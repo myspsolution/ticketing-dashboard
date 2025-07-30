@@ -5,6 +5,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\User\UserDashboardController;
 use App\Http\Controllers\User\UserTaskController;
 use App\Exports\TaskExport;
+use App\Http\Controllers\Admin\AdminDashboardController;
 use Maatwebsite\Excel\Facades\Excel;
 
 Route::get('/', function () {
@@ -14,10 +15,7 @@ Route::get('/', function () {
 // Middleware auth dan verified untuk semua halaman user
 Route::middleware(['auth', 'verified'])->group(function () {
 
-    // Dashboard (user dashboard)
-    Route::get('/dashboard', [UserDashboardController::class, 'dashboard'])->name('dashboard');
-
-    // Task: input & simpan
+    // Task: input & simpan (tambah task baru)
     Route::get('/task/form', [UserTaskController::class, 'create'])->name('task.form');
     Route::post('/task/store', [UserTaskController::class, 'store'])->name('task.store');
 
@@ -29,13 +27,31 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    Route::put('/user/task/{id}', [UserDashboardController::class, 'update'])->name('user.task.update');
-
-
+    // Export Task
     Route::get('/export-task', function () {
         return Excel::download(new TaskExport, 'tasks.xlsx');
     })->name('task.export');
 
+    // Route dashboard user
+    Route::get('/dashboard', [UserDashboardController::class, 'dashboard'])->name('dashboard'); // Dashboard User
+
+});
+
+Route::middleware(['auth', 'admin'])->group(function () {
+    Route::get('/admin/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
+});
+
+// Rute untuk User Dashboard dan admin redirection setelah login
+Route::middleware(['auth'])->group(function () {
+
+    // Redirect setelah login berdasarkan role
+    Route::get('/home', function () {
+        if (Auth::user()->role == 'admin') {
+            return redirect()->route('admin.dashboard'); // Jika admin, arahkan ke dashboard admin
+        } else {
+            return redirect()->route('user.dashboard'); // Jika user, arahkan ke dashboard user
+        }
+    });
 
 });
 
