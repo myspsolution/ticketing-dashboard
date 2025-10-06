@@ -8,8 +8,8 @@
     </div>
 
     {{-- Hanya form di dalam grid --}}
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div class="bg-white shadow-md rounded-lg p-6">
+    <div class="grid grid-cols-1 place-items-center">
+        <div class="bg-white shadow-md rounded-lg p-6 w-full md:w-1/2 lg:w-1/3">
             <h3 class="text-lg font-semibold mb-4">Tambah Task Baru</h3>
             <form action="{{ route('task.store') }}" method="POST">
                 @csrf
@@ -32,7 +32,7 @@
                 <div class="mb-4">
                     <label for="customer" class="block font-medium">Customer:</label>
                     <select name="customer" id="customer" class="w-full border rounded px-3 py-2" required>
-                        @foreach (['WIKA', 'Viral', 'Fithub', 'STI', 'BSG', 'BSSB', 'Garuda Food', 'BSI'] as $customer)
+                        @foreach (['WIKA', 'Viral', 'Fithub', 'STI', 'BSG', 'BSSB', 'Garuda Food', 'BSI', 'MAOAPA', 'OrangP'] as $customer)
                             <option value="{{ $customer }}">{{ $customer }}</option>
                         @endforeach
                     </select>
@@ -105,7 +105,7 @@
                             <form action="{{ route('task.update', $task->id) }}" method="POST">
                                 @csrf
                                 @method('PATCH')
-                                <select name="kategori" class="border px-2 py-1 rounded" onchange="this.form.submit()">
+                                <select name="kategori" class="border px-7 py-1 rounded" onchange="this.form.submit()">
                                     <option value="pending" {{ $task->kategori == 'pending' ? 'selected' : '' }}>Pending</option>
                                     <option value="inprogress" {{ $task->kategori == 'inprogress' ? 'selected' : '' }}>In Progress</option>
                                     <option value="done" {{ $task->kategori == 'done' ? 'selected' : '' }}>Done</option>

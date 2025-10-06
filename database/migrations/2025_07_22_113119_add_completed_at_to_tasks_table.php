@@ -9,10 +9,10 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up(): void
+    public function up(): void  
     {
         Schema::table('tasks', function (Blueprint $table) {
-            //
+            $table->timestamp('completed_at')->nullable()->after('kategori');
         });
     }
 
