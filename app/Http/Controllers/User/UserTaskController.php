@@ -15,23 +15,30 @@ class UserTaskController extends Controller
         return view('user.form', compact('tasks'));
     }
 
-    public function store(Request $request)
+   public function store(Request $request)
     {
         $validated = $request->validate([
-            'title' => 'required|string|max:255',
+            'title'     => 'required|string|max:255',
             'deskripsi' => 'required|string',
-            'tanggal' => 'required|date',
-            'customer' => 'required|in:WIKA,Viral,Fithub,STI,BSG,BSSB,Garuda Food,BSI',
-            'tipe' => 'required|in:standart,custom',
-            'kategori' => 'required|in:pending,inprogress,done,cancel',
+            'tanggal'   => 'required|date',
+            'customer'  => 'required|in:WIKA,Viral,Fithub,STI,BSG,BSSB,Garuda Food,BSI,MAOAPA,OrangP',
+            'tipe'      => 'required|in:standart,custom', // atau 'standard' kalau itu yang dipakai
+            'kategori'  => 'required|in:pending,inprogress,done,cancel',
         ]);
 
         $validated['user_id'] = Auth::id();
 
-        Task::create($validated);
-
-        return redirect()->route('dashboard')->with('success', 'Task berhasil disimpan!');
+        // ✅ set completed_at saat create bila status done/cancel
+        $status = strtolower(trim($validated['kategori']));
+        if (in_array($status, ['done', 'cancel'], true)) {
+            $validated['completed_at'] = now();
     }
+
+    Task::create($validated);
+
+    return redirect()->route('dashboard')->with('success', 'Task berhasil disimpan!');
+}
+
 
     public function update(Request $request, $id)
     {
