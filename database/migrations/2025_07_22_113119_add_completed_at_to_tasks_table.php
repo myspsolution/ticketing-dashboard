@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void  
     {
+        if (Schema::hasTable('tasks') && !Schema::hasColumn('tasks', 'completed_at')) { 
         Schema::table('tasks', function (Blueprint $table) {
             $table->timestamp('completed_at')->nullable()->after('kategori');
         });
+    }
     }
 
     /**
