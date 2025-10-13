@@ -21,7 +21,7 @@ class UserTaskController extends Controller
             'title'     => 'required|string|max:255',
             'deskripsi' => 'required|string',
             'tanggal'   => 'required|date',
-            'customer'  => 'required|in:WIKA,Viral,Fithub,STI,BSG,BSSB,Garuda Food,BSI,MAOAPA,OrangP',
+            'customer'  => 'required|in:OrangT,WIKA,Viral,Fithub,STI,BSG,BSSB,Garuda Food,BSI,MAOAPA,OrangP',
             'tipe'      => 'required|in:standart,custom', // atau 'standard' kalau itu yang dipakai
             'kategori'  => 'required|in:pending,inprogress,done,cancel',
         ]);

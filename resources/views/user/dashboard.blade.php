@@ -32,7 +32,7 @@
                 <div class="mb-4">
                     <label for="customer" class="block font-medium">Customer:</label>
                     <select name="customer" id="customer" class="w-full border rounded px-3 py-2" required>
-                        @foreach (['WIKA', 'Viral', 'Fithub', 'STI', 'BSG', 'BSSB', 'Garuda Food', 'BSI', 'MAOAPA', 'OrangP'] as $customer)
+                        @foreach (['OrangT','WIKA', 'Viral', 'Fithub', 'STI', 'BSG', 'BSSB', 'Garuda Food', 'BSI', 'MAOAPA', 'OrangP'] as $customer)
                             <option value="{{ $customer }}">{{ $customer }}</option>
                         @endforeach
                     </select>
