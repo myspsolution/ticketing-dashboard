@@ -19,8 +19,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/task/form', [UserTaskController::class, 'create'])->name('task.form');
     Route::post('/task/store', [UserTaskController::class, 'store'])->name('task.store');
 
-    // Task: update kategori (ubah jadi done/cancel)
-    Route::patch('/task/{id}', [UserDashboardController::class, 'update'])->name('task.update');
+    // Task: edit & update
+    Route::get('/task/{id}/edit', [UserTaskController::class, 'edit'])->name('task.edit');
+    Route::patch('/task/{id}', [UserTaskController::class, 'update'])->name('task.update');
+
+    // Task: delete
+    Route::delete('/task/{id}', [UserDashboardController::class, 'destroy'])->name('task.destroy');
 
     // Profile routes
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

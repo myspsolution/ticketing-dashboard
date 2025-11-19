@@ -15,45 +15,94 @@ class UserTaskController extends Controller
         return view('user.form', compact('tasks'));
     }
 
-   public function store(Request $request)
+    public function store(Request $request)
     {
         $validated = $request->validate([
             'title'     => 'required|string|max:255',
             'deskripsi' => 'required|string',
             'tanggal'   => 'required|date',
-            'customer'  => 'required|in:OrangT,WIKA,Viral,Fithub,STI,BSG,BSSB,Garuda Food,BSI,MAOAPA,OrangP',
-            'tipe'      => 'required|in:standart,custom', // atau 'standard' kalau itu yang dipakai
+            'customer'  => 'required|in:WIKA,Viral,Fithub,STI,BSG,BSSB,Garuda Food,BSI,MAOAPA,OrangP,Xentix',
+            'tipe'      => 'required|in:standart,custom',
             'kategori'  => 'required|in:pending,inprogress,done,cancel',
         ]);
 
         $validated['user_id'] = Auth::id();
 
-        // ✅ set completed_at saat create bila status done/cancel
+        // set completed_at saat create bila status done/cancel
         $status = strtolower(trim($validated['kategori']));
         if (in_array($status, ['done', 'cancel'], true)) {
             $validated['completed_at'] = now();
+        } // ← ini yang tadi belum ketutup
+
+        Task::create($validated);
+
+        return redirect()->route('dashboard')->with('success', 'Task berhasil disimpan!');
     }
 
-    Task::create($validated);
+    /**
+     * TAMPILKAN FORM EDIT
+     */
+    public function edit($id)
+    {
+        $task = Task::findOrFail($id);
+        $user = Auth::user();
 
-    return redirect()->route('dashboard')->with('success', 'Task berhasil disimpan!');
-}
+        // hanya admin atau pemilik task
+        if ($user->role !== 'admin' && $task->user_id !== $user->id) {
+            abort(403, 'Anda tidak punya akses untuk mengedit task ini.');
+        }
 
+        return view('user.task_edit', compact('task'));
+    }
 
+    /**
+     * UPDATE TASK (dipakai baik dari form edit maupun dropdown kategori)
+     */
     public function update(Request $request, $id)
     {
         $request->validate([
-            'kategori' => 'required|in:pending,inprogress,done,cancel',
+            'title'     => 'sometimes|required|string|max:255',
+            'deskripsi' => 'sometimes|required|string',
+            'tanggal'   => 'sometimes|required|date',
+            'customer'  => 'sometimes|required|in:WIKA,Viral,Fithub,STI,BSG,BSSB,Garuda Food,BSI,MAOAPA,OrangP,Xentix',
+            'tipe'      => 'sometimes|required|in:standart,custom',
+            'kategori'  => 'sometimes|required|in:pending,inprogress,done,cancel',
         ]);
 
-        $task = Task::where('user_id', Auth::id())->findOrFail($id); // pastikan hanya task milik user
+        $task = Task::findOrFail($id);
+        $user = Auth::user();
 
-        $task->kategori = strtolower($request->kategori);
+        if ($user->role !== 'admin' && $task->user_id !== $user->id) {
+            abort(403, 'Anda tidak punya akses untuk mengubah task ini.');
+        }
 
-        $task->completed_at = in_array($task->kategori, ['done', 'cancel']) ? now() : null;
+        // field dari form edit
+        if ($request->filled('title')) {
+            $task->title = $request->title;
+        }
+        if ($request->filled('deskripsi')) {
+            $task->deskripsi = $request->deskripsi;
+        }
+        if ($request->filled('tanggal')) {
+            $task->tanggal = $request->tanggal;
+        }
+        if ($request->filled('customer')) {
+            $task->customer = $request->customer;
+        }
+        if ($request->filled('tipe')) {
+            $task->tipe = $request->tipe;
+        }
+
+        // kategori bisa dari form edit atau dropdown di dashboard
+        if ($request->filled('kategori')) {
+            $task->kategori = strtolower($request->kategori);
+            $task->completed_at = in_array($task->kategori, ['done', 'cancel'])
+                ? now()
+                : null;
+        }
 
         $task->save();
 
-        return redirect()->back()->with('success', 'Task berhasil diperbarui!');
+        return redirect()->route('dashboard')->with('success', 'Task berhasil diperbarui.');
     }
 }
